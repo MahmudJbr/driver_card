@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Violations (Överträdelser)</h2>
+<table>
+  <tr><th>ID</th><th>Datum</th><th>Typ</th><th>Detaljer</th><th>Regnr</th></tr>
+  {% for v in violations %}
+  <tr>
+    <td>{{ v.violationID }}</td>
+    <td>{{ v.datum }}</td>
+    <td>{{ v.violationstyp }}</td>
+    <td>{{ v.detaljer }}</td>
+    <td>{{ v.registreringsnummer }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

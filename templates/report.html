@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Weekly report</h2>
+
+<form method="post">
+  <label>Från (YYYY-MM-DD):</label>
+  <input name="from_date" value="{{ from_date or '2026-01-01' }}" required>
+  <label>Till (YYYY-MM-DD):</label>
+  <input name="to_date" value="{{ to_date or '2026-02-01' }}" required>
+  <button type="submit">Kör rapport</button>
+</form>
+
+{% if report %}
+<table>
+  <tr><th>User</th><th>Namn</th><th>Vecka</th><th>Timmar</th><th>KM</th><th>Pass</th></tr>
+  {% for r in report %}
+  <tr>
+    <td>{{ r.user_id }}</td>
+    <td>{{ r.driver_name }}</td>
+    <td>{{ r.week_no }}</td>
+    <td>{{ r.total_drive_hours }}</td>
+    <td>{{ r.total_distance_km }}</td>
+    <td>{{ r.session_count }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+{% endblock %}

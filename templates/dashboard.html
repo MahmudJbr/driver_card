@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Dashboard</h2>
+<p>Inloggad som: <b>{{ user.fName }} {{ user.lName }}</b> ({{ user.email }})</p>
+
+<h3>Förarkort</h3>
+{% if card %}
+  <ul>
+    <li>Kortnummer: {{ card.card_number }}</li>
+    <li>Giltigt till: {{ card.expiry_date }}</li>
+    <li>Status: {{ card.status }}</li>
+  </ul>
+{% else %}
+  <p>Inget förarkort hittades.</p>
+{% endif %}
+
+<h3>Snabbstatistik</h3>
+<ul>
+  <li>Antal avslutade körpass: {{ stats.sessions_count }}</li>
+  <li>Total sträcka: {{ stats.total_km }} km</li>
+</ul>
+
+<h3>Olösta Events</h3>
+{% if events %}
+  <ul>
+    {% for e in events %}
+      <li>[{{ e.event_type }}] {{ e.message }} ({{ e.created_at }})</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Inga olösta events.</p>
+{% endif %}
+{% endblock %}

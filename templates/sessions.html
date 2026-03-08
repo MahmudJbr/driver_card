@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Körpass</h2>
+<table>
+  <tr>
+    <th>ID</th><th>Start</th><th>Slut</th><th>Körtid</th><th>Sträcka</th><th>Fordon</th>
+  </tr>
+  {% for s in sessions %}
+  <tr>
+    <td>{{ s.sessionID }}</td>
+    <td>{{ s.startTid }}</td>
+    <td>{{ s.slutTid }}</td>
+    <td>{{ s["körtid"] }}</td>
+    <td>{{ s["sträcka"] }} km</td>
+    <td>{{ s.registreringsnummer }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

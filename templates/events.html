@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Events</h2>
+<table>
+  <tr><th>ID</th><th>Typ</th><th>Skapad</th><th>Due</th><th>Meddelande</th><th>Status</th><th>Åtgärd</th></tr>
+  {% for e in events %}
+  <tr>
+    <td>{{ e.eventID }}</td>
+    <td>{{ e.event_type }}</td>
+    <td>{{ e.created_at }}</td>
+    <td>{{ e.due_date }}</td>
+    <td>{{ e.message }}</td>
+    <td>{{ "resolved" if e.is_resolved else "open" }}</td>
+    <td>
+      {% if not e.is_resolved %}
+      <form method="post" style="margin:0">
+        <input type="hidden" name="event_id" value="{{ e.eventID }}">
+        <button type="submit">Resolve</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
+    
