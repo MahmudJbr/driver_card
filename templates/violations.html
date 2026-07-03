@@ -1,16 +1,55 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Violations (Överträdelser)</h2>
-<table>
-  <tr><th>ID</th><th>Datum</th><th>Typ</th><th>Detaljer</th><th>Regnr</th></tr>
-  {% for v in violations %}
-  <tr>
-    <td>{{ v.violationID }}</td>
-    <td>{{ v.datum }}</td>
-    <td>{{ v.violationstyp }}</td>
-    <td>{{ v.detaljer }}</td>
-    <td>{{ v.registreringsnummer }}</td>
-  </tr>
-  {% endfor %}
-</table>
+
+<section class="page-header">
+  <div>
+    <h1>Överträdelser</h1>
+    <p class="page-subtitle">Körtidsvarningar med datum, typ och fordonskoppling.</p>
+  </div>
+</section>
+
+<section class="table-card">
+  <div class="table-toolbar">
+    <div>
+      <h3>Registrerade överträdelser</h3>
+      <p>{{ violations|length }} poster visas.</p>
+    </div>
+  </div>
+
+  {% if violations %}
+    <div class="table-wrap">
+      <table>
+        <tr>
+          {% if user.role == "admin" %}
+            <th>Förare</th>
+          {% endif %}
+          <th>ID</th>
+          <th>Datum</th>
+          <th>Typ</th>
+          <th>Detaljer</th>
+          <th>Regnr</th>
+        </tr>
+
+        {% for v in violations %}
+        <tr>
+          {% if user.role == "admin" %}
+            <td><strong>{{ v.fName }} {{ v.lName }}</strong></td>
+          {% endif %}
+          <td>#{{ v.violationID }}</td>
+          <td>{{ v.datum }}</td>
+          <td><span class="badge badge-danger">{{ v.violationstyp }}</span></td>
+          <td>{{ v.detaljer }}</td>
+          <td>{{ v.registreringsnummer if v.registreringsnummer else '-' }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>Inga överträdelser hittades</h3>
+      <p>Överträdelser visas här när en körning bryter mot de regler som databasen kontrollerar.</p>
+    </div>
+  {% endif %}
+</section>
+
 {% endblock %}

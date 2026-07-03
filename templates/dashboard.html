@@ -1,33 +1,199 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Dashboard</h2>
-<p>Inloggad som: <b>{{ user.fName }} {{ user.lName }}</b> ({{ user.email }})</p>
 
-<h3>Förarkort</h3>
-{% if card %}
-  <ul>
-    <li>Kortnummer: {{ card.card_number }}</li>
-    <li>Giltigt till: {{ card.expiry_date }}</li>
-    <li>Status: {{ card.status }}</li>
-  </ul>
-{% else %}
-  <p>Inget förarkort hittades.</p>
+<section class="page-header">
+  <div>
+    <h1>Dashboard</h1>
+    <p class="page-subtitle">
+      Inloggad som {{ user.fName }} {{ user.lName }} · {{ user.email }}
+    </p>
+  </div>
+
+  <span class="badge badge-neutral">{{ user.role }}</span>
+</section>
+
+{% if user.role == "förare" %}
+
+  <section class="metric-grid">
+    <div class="stat-card">
+      <p class="stat-label">Avslutade körpass</p>
+      <p class="stat-value">{{ stats.sessions_count }}</p>
+      <p class="stat-note">Registrerade i systemet</p>
+    </div>
+
+    <div class="stat-card">
+      <p class="stat-label">Total sträcka</p>
+      <p class="stat-value">{{ stats.total_km }}</p>
+      <p class="stat-note">Kilometer körda</p>
+    </div>
+
+    <div class="stat-card">
+      <p class="stat-label">Öppna händelser</p>
+      <p class="stat-value">{{ events|length }}</p>
+      <p class="stat-note">Kräver uppmärksamhet</p>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h3>Förarkort</h3>
+          <p>Digital kortstatus för aktuell förare.</p>
+        </div>
+        {% if card and card.status == "ACTIVE" %}
+          <span class="badge badge-success">Aktivt</span>
+        {% elif card %}
+          <span class="badge badge-warning">{{ card.status }}</span>
+        {% endif %}
+      </div>
+
+      {% if card %}
+        <ul class="info-list">
+          <li class="info-row">
+            <span class="info-label">Kortnummer</span>
+            <span class="info-value">{{ card.card_number }}</span>
+          </li>
+          <li class="info-row">
+            <span class="info-label">Utfärdat</span>
+            <span class="info-value">{{ card.issued_date }}</span>
+          </li>
+          <li class="info-row">
+            <span class="info-label">Giltigt till</span>
+            <span class="info-value">{{ card.expiry_date }}</span>
+          </li>
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <h3>Inget förarkort hittades</h3>
+          <p>Det finns inget digitalt kort kopplat till den här användaren ännu.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h3>Olösta händelser</h3>
+          <p>Senaste varningar och systemmeddelanden.</p>
+        </div>
+        <a class="btn btn-secondary" href="{{ url_for('events_page') }}">Visa alla</a>
+      </div>
+
+      {% if events %}
+        <ul class="event-list">
+          {% for e in events %}
+            <li class="event-item">
+              <div>
+                <div class="event-meta">{{ e.event_type }} · {{ e.created_at }}</div>
+                <div class="event-message">{{ e.message }}</div>
+              </div>
+              {% if e.event_type == "OVERDRIVE" %}
+                <span class="badge badge-danger">Varning</span>
+              {% elif e.event_type == "CARD_EXPIRY_SOON" %}
+                <span class="badge badge-warning">Kort</span>
+              {% else %}
+                <span class="badge badge-neutral">Info</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <h3>Inga öppna händelser</h3>
+          <p>Alla varningar och meddelanden är hanterade.</p>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+{% elif user.role == "admin" %}
+
+  <section class="metric-grid">
+    <div class="stat-card">
+      <p class="stat-label">Förare</p>
+      <p class="stat-value">{{ drivers|length }}</p>
+      <p class="stat-note">Aktiva i databasen</p>
+    </div>
+
+    <div class="stat-card">
+      <p class="stat-label">Körpass</p>
+      <p class="stat-value">{{ all_stats|sum(attribute='sessions') }}</p>
+      <p class="stat-note">Totalt registrerade</p>
+    </div>
+
+    <div class="stat-card">
+      <p class="stat-label">Överträdelser</p>
+      <p class="stat-value">{{ all_violations|length }}</p>
+      <p class="stat-note">Senaste posterna</p>
+    </div>
+  </section>
+
+  <section class="dashboard-grid">
+    <div class="table-card">
+      <div class="table-toolbar">
+        <div>
+          <h3>Föraröversikt</h3>
+          <p>Jämför körpass och total körsträcka per förare.</p>
+        </div>
+        <a class="btn btn-secondary" href="{{ url_for('report_page') }}">Rapport</a>
+      </div>
+
+      {% if all_stats %}
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Namn</th>
+              <th>Körpass</th>
+              <th>Total km</th>
+            </tr>
+            {% for s in all_stats %}
+            <tr>
+              <td><strong>{{ s.fName }} {{ s.lName }}</strong></td>
+              <td>{{ s.sessions }}</td>
+              <td>{{ s.total_km }} km</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <h3>Ingen statistik hittades</h3>
+          <p>Lägg till förare och körpass för att fylla översikten.</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h3>Senaste överträdelser</h3>
+          <p>Poster som kräver uppföljning.</p>
+        </div>
+        <a class="btn btn-secondary" href="{{ url_for('violations_page') }}">Visa alla</a>
+      </div>
+
+      {% if all_violations %}
+        <ul class="event-list">
+          {% for v in all_violations %}
+            <li class="event-item">
+              <div>
+                <div class="event-meta">{{ v.fName }} {{ v.lName }} · {{ v.datum }}</div>
+                <div class="event-message">{{ v.violationstyp }} · {{ v.detaljer }}</div>
+              </div>
+              <span class="badge badge-danger">Överträdelse</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="empty-state">
+          <h3>Inga överträdelser</h3>
+          <p>Det finns inga registrerade överträdelser i nuläget.</p>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
 {% endif %}
 
-<h3>Snabbstatistik</h3>
-<ul>
-  <li>Antal avslutade körpass: {{ stats.sessions_count }}</li>
-  <li>Total sträcka: {{ stats.total_km }} km</li>
-</ul>
-
-<h3>Olösta Events</h3>
-{% if events %}
-  <ul>
-    {% for e in events %}
-      <li>[{{ e.event_type }}] {{ e.message }} ({{ e.created_at }})</li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>Inga olösta events.</p>
-{% endif %}
 {% endblock %}

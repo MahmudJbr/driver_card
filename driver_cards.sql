@@ -1,7 +1,7 @@
 CREATE TABLE `driver_cards` (
   `cardID` int NOT NULL AUTO_INCREMENT,
   `userID` int NOT NULL,
-  `card_number` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `card_number` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `issued_date` date NOT NULL,
   `expiry_date` date NOT NULL,
   `status` enum('ACTIVE','EXPIRED','LOST','REPLACED') COLLATE utf8mb4_unicode_ci DEFAULT 'ACTIVE',

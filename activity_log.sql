@@ -10,7 +10,7 @@ CREATE TABLE `activity_logs` (
   PRIMARY KEY (`logID`),
   KEY `vehicleID` (`vehicleID`),
   KEY `idx_activity_user_time` (`userID`,`startTid`),
-  CONSTRAINT `activity_logs_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`),
-  CONSTRAINT `activity_logs_ibfk_2` FOREIGN KEY (`vehicleID`) REFERENCES `vehicles` (`vehicleID`),
-  CONSTRAINT `chk_activity_time` CHECK ((`slutTid` > `startTid`))
+  FOREIGN KEY (`userID`) REFERENCES `users` (`userID`),
+  FOREIGN KEY (`vehicleID`) REFERENCES `vehicles` (`vehicleID`),
+  CHECK ((`slutTid` > `startTid`))
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

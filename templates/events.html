@@ -1,26 +1,134 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Events</h2>
-<table>
-  <tr><th>ID</th><th>Typ</th><th>Skapad</th><th>Due</th><th>Meddelande</th><th>Status</th><th>Åtgärd</th></tr>
-  {% for e in events %}
-  <tr>
-    <td>{{ e.eventID }}</td>
-    <td>{{ e.event_type }}</td>
-    <td>{{ e.created_at }}</td>
-    <td>{{ e.due_date }}</td>
-    <td>{{ e.message }}</td>
-    <td>{{ "resolved" if e.is_resolved else "open" }}</td>
-    <td>
-      {% if not e.is_resolved %}
-      <form method="post" style="margin:0">
-        <input type="hidden" name="event_id" value="{{ e.eventID }}">
-        <button type="submit">Resolve</button>
-      </form>
-      {% endif %}
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+
+<section class="page-header">
+  <div>
+    <h1>Händelser</h1>
+    <p class="page-subtitle">Varningar, kortpåminnelser och aktivitetsloggar i samma vy.</p>
+  </div>
+</section>
+
+<section class="table-card">
+  <div class="table-toolbar">
+    <div>
+      <h3>Händelselista</h3>
+      <p>{{ events|length }} händelser visas.</p>
+    </div>
+  </div>
+
+  {% if events %}
+    <div class="table-wrap">
+      <table>
+        <tr>
+          {% if user.role == "admin" %}
+            <th>Förare</th>
+          {% endif %}
+          <th>Typ</th>
+          <th>Skapad</th>
+          <th>Förfallodatum</th>
+          <th>Meddelande</th>
+          <th>Status</th>
+          <th>Åtgärd</th>
+        </tr>
+
+        {% for e in events %}
+        <tr>
+          {% if user.role == "admin" %}
+            <td><strong>{{ e.fName }} {{ e.lName }}</strong></td>
+          {% endif %}
+          <td>
+            {% if e.event_type == "OVERDRIVE" %}
+              <span class="badge badge-danger">Overdrive</span>
+            {% elif e.event_type == "CARD_EXPIRY_SOON" %}
+              <span class="badge badge-warning">Kort löper ut</span>
+            {% else %}
+              <span class="badge badge-neutral">{{ e.event_type }}</span>
+            {% endif %}
+          </td>
+          <td>{{ e.created_at }}</td>
+          <td>{{ e.due_date if e.due_date else '-' }}</td>
+          <td>{{ e.message }}</td>
+          <td>
+            {% if e.is_resolved %}
+              <span class="badge badge-success">Löst</span>
+            {% else %}
+              <span class="badge badge-warning">Olöst</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not e.is_resolved %}
+              <form method="post" class="inline-form">
+                <input type="hidden" name="event_id" value="{{ e.eventID }}">
+                <button type="submit">Markera löst</button>
+              </form>
+            {% else %}
+              <span class="cell-muted">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>Inga händelser hittades</h3>
+      <p>När systemet skapar varningar eller påminnelser visas de här.</p>
+    </div>
+  {% endif %}
+</section>
+
+<section class="table-card">
+  <div class="table-toolbar">
+    <div>
+      <h3>Aktivitetslogg</h3>
+      <p>{{ activity_logs|length }} aktiviteter visas.</p>
+    </div>
+  </div>
+
+  {% if activity_logs %}
+    <div class="table-wrap">
+      <table>
+        <tr>
+          {% if user.role == "admin" %}
+            <th>Förare</th>
+          {% endif %}
+          <th>Start</th>
+          <th>Slut</th>
+          <th>Aktivitet</th>
+          <th>Källa</th>
+          <th>Anteckningar</th>
+          <th>Fordon</th>
+        </tr>
+
+        {% for log in activity_logs %}
+        <tr>
+          {% if user.role == "admin" %}
+            <td><strong>{{ log.fName }} {{ log.lName }}</strong></td>
+          {% endif %}
+          <td>{{ log.startTid }}</td>
+          <td>{{ log.slutTid }}</td>
+          <td>
+            {% if log.activity == "DRIVE" %}
+              <span class="badge badge-success">Drive</span>
+            {% elif log.activity == "REST" %}
+              <span class="badge badge-neutral">Rest</span>
+            {% else %}
+              <span class="badge badge-warning">{{ log.activity }}</span>
+            {% endif %}
+          </td>
+          <td>{{ log.source }}</td>
+          <td>{{ log.notes if log.notes else '-' }}</td>
+          <td>{{ log.registreringsnummer if log.registreringsnummer else '-' }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>Inga aktivitetsloggar hittades</h3>
+      <p>Registrerade körningar, raster och övrigt arbete visas här.</p>
+    </div>
+  {% endif %}
+</section>
+
 {% endblock %}
-    

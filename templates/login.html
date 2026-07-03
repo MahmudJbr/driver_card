@@ -1,10 +1,29 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Logga in</h2>
-<form method="post">
-  <label>Email:</label><br>
-  <input name="email" placeholder="anna@example.com" required>
-  <button type="submit">Logga in</button>
-</form>
-<p>Demo: anna@example.com</p>
+
+<div class="panel auth-card">
+  <div class="panel-header">
+    <div>
+      <h3>Logga in</h3>
+      {% if selected_role == "förare" %}
+        <p>Du loggar in som förare.</p>
+      {% elif selected_role == "admin" %}
+        <p>Du loggar in som arbetsledare.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <form method="post">
+    <input type="hidden" name="selected_role" value="{{ selected_role }}">
+
+    <label for="email">Email</label>
+    <input id="email" name="email" placeholder="example@email.com" required>
+
+    <div class="form-actions">
+      <a class="btn btn-secondary" href="{{ url_for('home') }}">Tillbaka</a>
+      <button type="submit">Logga in</button>
+    </div>
+  </form>
+</div>
+
 {% endblock %}

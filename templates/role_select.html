@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="role-select">
+  <h1>Välkommen till e-Förarkort</h1>
+  <p>Välj vilken typ av användare du är:</p>
+
+  <div class="role-actions">
+    <a class="btn" href="{{ url_for('login', role_key='driver') }}">Förare</a>
+
+    <a class="btn btn-secondary" href="{{ url_for('login', role_key='admin') }}">Arbetsledare</a>
+  </div>
+</div>
+
+{% endblock %}

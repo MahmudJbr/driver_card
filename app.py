@@ -5,7 +5,7 @@ from datetime import datetime
 DB_CONFIG = {
     "host": "localhost",
     "user": "eforarkort_user",
-    "password": "EttProjektLosenord!",
+    "password": "ADALLA1234",
     "database": "eforarkort",
     "port": 3306
 }

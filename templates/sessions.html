@@ -1,19 +1,82 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Körpass</h2>
-<table>
-  <tr>
-    <th>ID</th><th>Start</th><th>Slut</th><th>Körtid</th><th>Sträcka</th><th>Fordon</th>
-  </tr>
-  {% for s in sessions %}
-  <tr>
-    <td>{{ s.sessionID }}</td>
-    <td>{{ s.startTid }}</td>
-    <td>{{ s.slutTid }}</td>
-    <td>{{ s["körtid"] }}</td>
-    <td>{{ s["sträcka"] }} km</td>
-    <td>{{ s.registreringsnummer }}</td>
-  </tr>
-  {% endfor %}
-</table>
+
+<section class="page-header">
+  <div>
+    <h1>Körpass</h1>
+    <p class="page-subtitle">
+      {% if user.role == "admin" %}
+        Alla registrerade körpass med förare och fordonsinformation.
+      {% else %}
+        Din körhistorik med tid, sträcka och fordon.
+      {% endif %}
+    </p>
+  </div>
+
+  {% if user.role == "förare" %}
+    <a class="btn" href="{{ url_for('add_session_page') }}">Nytt körpass</a>
+  {% endif %}
+</section>
+
+<section class="table-card">
+  <div class="table-toolbar">
+    <div>
+      <h3>Sessionshistorik</h3>
+      <p>{{ sessions|length }} körpass visas.</p>
+    </div>
+  </div>
+
+  {% if sessions %}
+    <div class="table-wrap">
+      <table>
+        <tr>
+          {% if user.role == "admin" %}
+            <th>Förare</th>
+          {% endif %}
+          <th>Session</th>
+          <th>Start</th>
+          <th>Slut</th>
+          <th>Körtid</th>
+          <th>Sträcka</th>
+          <th>Status</th>
+          <th>Regnr</th>
+          <th>Fordon</th>
+        </tr>
+
+        {% for s in sessions %}
+        <tr>
+          {% if user.role == "admin" %}
+            <td><strong>{{ s.fName }} {{ s.lName }}</strong></td>
+          {% endif %}
+          <td>#{{ s.sessionID }}</td>
+          <td>{{ s.startTid }}</td>
+          <td>{{ s.slutTid }}</td>
+          <td>{{ s.körtid if s.körtid else '-' }}</td>
+          <td>{{ s.sträcka }} km</td>
+          <td>
+            {% if s.status == "avslutad" %}
+              <span class="badge badge-success">Avslutad</span>
+            {% elif s.status == "aktiv" %}
+              <span class="badge badge-warning">Aktiv</span>
+            {% else %}
+              <span class="badge badge-neutral">{{ s.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ s.registreringsnummer if s.registreringsnummer else '-' }}</td>
+          <td>
+            {{ s.fabrikat if s.fabrikat else '-' }}
+            {% if s.fordonstyp %}<span class="cell-muted">· {{ s.fordonstyp }}</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>Inga körpass hittades</h3>
+      <p>Registrera ett körpass för att börja fylla historiken.</p>
+    </div>
+  {% endif %}
+</section>
+
 {% endblock %}

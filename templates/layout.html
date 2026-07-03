@@ -2,130 +2,588 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>e-Förarkort</title>
 
     <style>
+        :root {
+            --ink: #16212f;
+            --muted: #667085;
+            --surface: rgba(255, 255, 255, 0.94);
+            --surface-strong: #ffffff;
+            --line: rgba(22, 33, 47, 0.12);
+            --accent: #00c7df;
+            --accent-dark: #008ca0;
+            --success: #147b4a;
+            --warning: #b7791f;
+            --danger: #b42318;
+            --shadow: 0 18px 48px rgba(0, 0, 0, 0.22);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-
-            /* Bakgrundsbild */
             background: url("{{ url_for('static', filename='truck.jpg') }}") no-repeat center center fixed;
             background-size: cover;
+            color: var(--ink);
         }
 
-        /* Mörk overlay så texten syns tydligt */
         .overlay {
-            background: rgba(0, 0, 0, 0.65);
             min-height: 100vh;
-            padding: 20px;
-            color: white;
+            background:
+                linear-gradient(120deg, rgba(8, 17, 26, 0.82), rgba(8, 17, 26, 0.58)),
+                rgba(0, 0, 0, 0.28);
         }
 
-        nav {
-            margin-bottom: 20px;
+        .app-shell {
+            width: min(1180px, calc(100% - 40px));
+            margin: 0 auto;
+            padding: 22px 0 48px;
         }
 
-        nav a {
-            color: #00e0ff;
-            margin-right: 15px;
+        .top-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 12px 14px;
+            background: rgba(8, 19, 30, 0.82);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 8px;
+            box-shadow: 0 10px 32px rgba(0, 0, 0, 0.18);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .nav-links a {
+            color: #d9fbff;
+            padding: 9px 10px;
+            border-radius: 6px;
             text-decoration: none;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 700;
         }
 
-        nav a:hover {
-            text-decoration: underline;
+        .nav-links a:hover {
+            background: rgba(0, 199, 223, 0.16);
+            color: #ffffff;
         }
 
-        h1, h2, h3 {
+        .nav-links .logout-link {
+            color: #ffe7e4;
+        }
+
+        main {
+            margin-top: 28px;
+        }
+
+        h1, h2, h3, p {
             margin-top: 0;
         }
 
-        /* Kort-liknande rutor */
-        .card {
-            background: rgba(255,255,255,0.12);
-            padding: 20px;
-            border-radius: 12px;
-            backdrop-filter: blur(6px);
-            margin-bottom: 20px;
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 18px;
+            margin-bottom: 18px;
+            color: #ffffff;
+        }
+
+        .page-header h1,
+        .page-header h2 {
+            margin-bottom: 6px;
+            font-size: clamp(30px, 4vw, 44px);
+            line-height: 1.08;
+        }
+
+        .page-subtitle {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.76);
+            font-size: 16px;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 22px;
+            color: var(--ink);
+        }
+
+        .panel + .panel,
+        .table-card + .panel,
+        .panel + .table-card {
+            margin-top: 18px;
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .panel-header h3 {
+            margin-bottom: 4px;
+            font-size: 19px;
+        }
+
+        .panel-header p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .dashboard-grid,
+        .metric-grid,
+        .two-column-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .dashboard-grid {
+            grid-template-columns: 1.1fr 0.9fr;
+            align-items: start;
+        }
+
+        .metric-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            margin-bottom: 16px;
+        }
+
+        .two-column-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .stat-card {
+            background: var(--surface-strong);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.14);
+        }
+
+        .stat-label {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            margin: 0;
+            color: var(--ink);
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .stat-note {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .info-list,
+        .event-list {
+            display: grid;
+            gap: 10px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .info-row,
+        .event-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .info-row:last-child,
+        .event-item:last-child {
+            border-bottom: 0;
+        }
+
+        .info-label,
+        .event-meta {
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .info-value,
+        .event-message {
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .event-message {
+            max-width: 520px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 26px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0;
+        }
+
+        .badge-success {
+            color: #075333;
+            background: #dff6ea;
+        }
+
+        .badge-warning {
+            color: #704400;
+            background: #fff2cc;
+        }
+
+        .badge-danger {
+            color: #7a1b14;
+            background: #ffe4e0;
+        }
+
+        .badge-neutral {
+            color: #344054;
+            background: #eef2f6;
+        }
+
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .table-toolbar h3 {
+            margin-bottom: 4px;
+            font-size: 19px;
+        }
+
+        .table-toolbar p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: rgba(255,255,255,0.9);
-            color: black;
-            border-radius: 8px;
-            overflow: hidden;
+            background: #ffffff;
+            color: var(--ink);
         }
 
         th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 13px 16px;
+            border-bottom: 1px solid #e7edf3;
             text-align: left;
+            vertical-align: middle;
+            white-space: nowrap;
         }
 
         th {
-            background: #f2f2f2;
+            background: #f5f8fb;
+            color: #475467;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .cell-muted {
+            color: var(--muted);
         }
 
         .msg {
-            background: rgba(255,255,255,0.85);
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 6px;
-            color: black;
+            background: #ffffff;
+            border-left: 4px solid var(--accent);
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            border-radius: 8px;
+            color: var(--ink);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: #344054;
+            font-size: 13px;
+            font-weight: 800;
         }
 
         input, select, button {
-            padding: 8px;
-            border-radius: 6px;
-            border: none;
-            margin-top: 5px;
-            margin-bottom: 10px;
+            font: inherit;
         }
 
+        input, select {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 11px;
+            border: 1px solid #cfd8e3;
+            border-radius: 6px;
+            background: #ffffff;
+            color: var(--ink);
+        }
+
+        input:focus,
+        select:focus {
+            outline: 3px solid rgba(0, 199, 223, 0.22);
+            border-color: var(--accent-dark);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .form-row-full {
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 18px;
+        }
+
+        .form-section {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+        }
+
+        .btn,
         button {
-            background-color: #00e0ff;
-            color: black;
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 9px 14px;
+            border: 0;
+            border-radius: 6px;
+            background: var(--accent);
+            color: #07151a;
+            text-decoration: none;
+            font-weight: 800;
             cursor: pointer;
         }
 
+        .btn:hover,
         button:hover {
-            background-color: #00b8cc;
+            background: var(--accent-dark);
+            color: #ffffff;
+        }
+
+        .btn-secondary {
+            background: #eef2f6;
+            color: #243447;
+        }
+
+        .btn-secondary:hover {
+            background: #dce5ef;
+            color: #16212f;
+        }
+
+        .btn-danger {
+            background: #ffe4e0;
+            color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #ffd1cb;
+            color: #7a1b14;
+        }
+
+        .inline-form {
+            margin: 0;
+        }
+
+        .empty-state {
+            padding: 36px 22px;
+            text-align: center;
+            color: var(--muted);
+            background: rgba(255, 255, 255, 0.78);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+            color: var(--ink);
+        }
+
+        .role-select {
+            min-height: calc(100vh - 138px);
+            max-width: 680px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #ffffff;
+        }
+
+        .role-select h1 {
+            margin-bottom: 14px;
+            font-size: clamp(34px, 6vw, 58px);
+        }
+
+        .role-select p {
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 20px;
+        }
+
+        .role-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .role-actions .btn {
+            min-width: 150px;
+        }
+
+        .auth-card {
+            width: min(420px, 100%);
+            margin: 70px auto 0;
+        }
+
+        @media (max-width: 860px) {
+            .app-shell {
+                width: min(100% - 24px, 1180px);
+                padding-top: 12px;
+            }
+
+            .top-nav,
+            .page-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .nav-links {
+                justify-content: flex-start;
+            }
+
+            .dashboard-grid,
+            .two-column-grid,
+            .metric-grid,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1,
+            .page-header h2 {
+                font-size: 31px;
+            }
+
+            .info-row,
+            .event-item,
+            .table-toolbar,
+            .form-actions {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .info-value,
+            .event-message {
+                text-align: left;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="overlay">
 
-        <nav>
-            {% if session.get("user_id") %}
-                <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('sessions_page') }}">Körpass</a>
-                <a href="{{ url_for('add_session_page') }}">Lägg till körpass</a>
-                <a href="{{ url_for('violations_page') }}">Överträdelser</a>
-                <a href="{{ url_for('events_page') }}">Händelser</a>
-                <a href="{{ url_for('report_page') }}">Rapport</a>
-                <a href="{{ url_for('logout') }}">Logga ut</a>
-            {% else %}
-                <a href="{{ url_for('login') }}">Logga in</a>
-            {% endif %}
+<body>
+<div class="overlay{% if not session.get('user_id') %} overlay-guest{% endif %}">
+    <div class="app-shell">
+        <nav class="top-nav">
+            <div class="brand">e-Förarkort</div>
+
+            <div class="nav-links">
+                {% if session.get("user_id") %}
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('sessions_page') }}">Körpass</a>
+                    <a href="{{ url_for('add_session_page') }}">Nytt körpass</a>
+                    <a href="{{ url_for('violations_page') }}">Överträdelser</a>
+                    <a href="{{ url_for('events_page') }}">Händelser</a>
+                    <a href="{{ url_for('report_page') }}">Rapport</a>
+                    <a class="logout-link" href="{{ url_for('logout') }}">Logga ut</a>
+                {% else %}
+                    <a href="{{ url_for('home') }}">Logga in</a>
+                {% endif %}
+            </div>
         </nav>
 
-        {% with messages = get_flashed_messages() %}
+        <main>
+            {% with messages = get_flashed_messages() %}
             {% if messages %}
-                <div class="msg">
-                    {% for m in messages %}
-                        <div>{{ m }}</div>
-                    {% endfor %}
-                </div>
+            <div class="msg">
+                {% for m in messages %}
+                <div>{{ m }}</div>
+                {% endfor %}
+            </div>
             {% endif %}
-        {% endwith %}
+            {% endwith %}
 
-        {% block content %}{% endblock %}
-
+            {% block content %}{% endblock %}
+        </main>
     </div>
+</div>
 </body>
 </html>

@@ -1,206 +1,254 @@
-Project Idea
-For this assignment, I designed and implemented a system called the Driver Card System. The purpose of the system is to digitally manage driver identity, driving time, and rest periods through a web-based platform, reducing the dependency on physical driver cards and manual reporting.
-Problem Description
-Today, professional drivers rely on physical driver cards and vehicle tachographs to record their driving and rest times. This creates several practical and financial problems:
-•	Drivers must insert their card into the tachograph to view their driving data
-•	If a card is lost or damaged, the driver must manually record driving time, which can lead to cheating
-•	Producing and replacing physical driver cards is expensive for both drivers and authorities
-•	Drivers cannot easily check their driving and rest time from home
-•	Transport companies have limited real-time insight into how their drivers are performing
-Because of this, both drivers and transport companies lack a simple and centralized digital solution to monitor driving time, plan work safely, and reduce costs.
-Proposed Solution
-The Driver Card System provides a digital alternative where drivers can log into a website and view their driving sessions, rest periods, and activities without needing to use a physical driver card.
-In the current version of the system:
-•	Drivers log in using email and password
-•	The system stores driving sessions, rest periods, and activities
-•	Drivers can see their own driving and rest time from home
-•	Company owners  can monitor their drivers and plan work schedules more safely
-Future Vision of the System
-In the future, the system is planned to expand and connect multiple stakeholders:
-•	Police authorities
-•	Transport authorities
-•	Drivers
-•	Haulage companies
-•	Truck manufacturers
-The long-term goal is to integrate the system directly with trucks through Bluetooth connectivity, allowing the vehicle to communicate with the website automatically.
-Drivers would then log in using BankID instead of email and password, providing secure digital identification. This would remove the need for physical driver cards and reduce administrative costs.
-Main Features of the Current System
-The system records driving sessions digitally, reducing the risk of cheating or incorrect manual reporting when a physical driver card is not available.
-Activity Logging
-All activities such as driving, resting, and other work are stored, providing a complete daily overview.
-Company Monitoring
-Managers can see how much legal driving time each driver has left and plan routes accordingly. Drivers with more available driving time can be assigned longer trips, while drivers with less time can be given shorter routes.
-Data Source
-The data used in this project is generated for demonstration purposes. Sample drivers, vehicles, and driving sessions are inserted into the database to simulate real-world driver activity.
-Logical Data Model
-The logical data model represents the main entities in the e-Driver Card System.
-The most important entities are User, DriverCard, Vehicle, Driving_sessions, Violation, Event and Activity_log.
-The User entity represents both drivers and company managers in the system. Each user has attributes such as userID, first name, last name, email and role.
-The DriverCard entity represents the digital driver identity that replaces the traditional physical driver card. Each driver has one digital driver card connected to their account.
-The Vehicle entity represents trucks used by drivers. Vehicles have attributes such as vehicleID, registration number, vehicle type, model and brand.
-The Driving_sessions entity represents a driving activity performed by a driver with a specific vehicle. Each session records information such as distance, driving time and timestamps.
-The Violation entity stores information about illegal driving behaviour, for example exceeding legal driving time limits.
-The Event entity represents system notifications or warnings that can be sent to drivers.
-The Activity_log entity records driver activities such as driving, resting or other work.
- 
-Relationships Between Entities
-The relationships between the entities are shown in the E/R diagram using diamond shapes. Cardinality is represented using 1 and M.
-1.	Each User is associated with one digital DriverCard.
-2.	A User can have many Driving_sessions, but each driving session belongs to one user.
-3.	A Vehicle can be used in many Driving_sessions, but each session involves one vehicle.
-4.	A Driving_session can result in multiple Violations, but each violation is linked to one specific session.
-5.	A User can have many Violations, but each violation belongs to one user.
-6.	A User can receive multiple Events, such as warnings or notifications.
-7.	A User can have many Activity_log entries, but each log entry belongs to one user.
-8.	A Vehicle can be connected to many Activity_log entries, but an activity log may or may not involve a vehicle.
-The system also uses database triggers to automate important logic in the database. For example, when a new driving session is inserted, a trigger automatically calculates the driving time from the start and end timestamps. If the driving time exceeds the legal limit, another trigger automatically creates a violation record and generates a warning event for the driver.
-SQL Queries
-1. Show a driver’s driving history including vehicle information
-This query shows all driving sessions for a specific driver together with vehicle information. It is a multirelation query because it combines data from the tables driving_sessions and vehicles. The query uses JOIN by matching driving_sessions.vehicleID with vehicles.vehicleID.
+# e-DriverCard
+
+e-DriverCard is a Flask and MySQL web application for managing digital driver cards, driving sessions, rest periods, violations, and weekly driving reports.
+
+The idea behind the project is simple: drivers and transport managers should be able to check driving-time data from a browser instead of relying only on a physical driver card or manual notes. The current version is a working local demo with separate views for drivers and company admins.
+
+## Demo
+
+Demo video placeholder:
+
+[Watch the e-DriverCard walkthrough](docs/demo/e-drivercard-demo.mp4)
+
+Planned walkthrough:
+
+- choosing a role and signing in
+- viewing the driver dashboard
+- adding a driving session and rest period
+- reviewing violations and events
+- generating a weekly report
+
+## Screenshots
+
+Replace these placeholders with screenshots from the working interface.
+
+| Role selection | Driver dashboard | Add driving session |
+| --- | --- | --- |
+| ![Role selection screenshot placeholder](docs/screenshots/role-selection.png) | ![Driver dashboard screenshot placeholder](docs/screenshots/driver-dashboard.png) | ![Add session screenshot placeholder](docs/screenshots/add-session.png) |
+
+| Admin overview | Violations | Weekly report |
+| --- | --- | --- |
+| ![Admin overview screenshot placeholder](docs/screenshots/admin-overview.png) | ![Violations screenshot placeholder](docs/screenshots/violations.png) | ![Weekly report screenshot placeholder](docs/screenshots/weekly-report.png) |
+
+## What It Does
+
+e-DriverCard gives drivers and transport managers a shared place to work with driving-time information.
+
+Drivers can:
+
+- view their digital driver card details
+- review completed driving sessions
+- add a new driving session from the web interface
+- record a connected rest period
+- see unresolved events and warnings
+- generate a weekly report for their own driving time
+
+Admins can:
+
+- see all registered drivers
+- compare driving-session statistics across drivers
+- review recent violations
+- inspect events and activity logs
+- generate weekly reports for the whole company
+
+## Why I Built It
+
+Professional drivers use physical driver cards and tachographs to record driving and rest time. That works, but it also creates a few practical problems:
+
+- drivers cannot easily check their data from home
+- companies do not always have a quick overview of driver availability
+- missing or damaged cards can lead to manual reporting
+- manual reporting increases the risk of mistakes or misuse
+- replacing physical cards costs time and money
+
+This project explores what a digital driver-card workflow could look like as a web system. It is not a replacement for official tachograph systems, but it shows the core flow: identity, driving sessions, rest periods, warnings, and reports in one place.
+
+## Features
+
+- Role-based entry for drivers and admins
+- Driver dashboard with card status, total distance, session count, and open events
+- Admin dashboard with driver list, company-wide statistics, and recent violations
+- Driving-session history joined with vehicle details
+- Manual session creation with optional rest-period logging
+- Events page for warnings, card-expiry notices, and resolved/unresolved status
+- Violation view with session and vehicle context
+- Weekly report generation through a stored procedure
+- SQL function for calculating driving time inside a date range
+
+## Tech Stack
+
+- Python
+- Flask
+- MySQL
+- mysql-connector-python
+- Jinja templates
+- HTML and CSS
+
+## Project Structure
+
+```text
+driverCard/
+├── web_app.py              # Flask web application
+├── app.py                  # CLI-style helper/demo entry point
+├── db_functions.py         # Database helper functions
+├── templates/              # Jinja HTML templates
+├── static/truck.jpg        # Interface background image
+├── users.sql               # Users table
+├── driver_cards.sql        # Digital driver-card table
+├── vehicles.sql            # Vehicle table
+├── driving_sessions.sql    # Driving-session table
+├── activity_log.sql        # Rest/drive/other activity log table
+├── events.sql              # Events and warnings table
+├── function.sql            # SQL function for total driving time
+├── procedure.sql           # Stored procedures for reports and card-expiry events
+└── demo_seed.sql           # Realistic demo data for portfolio walkthroughs
+```
+
+## Data Model
+
+The database is built around the main objects needed by a digital driver-card system:
+
+- `users` stores drivers and admins.
+- `driver_cards` stores each driver's digital card details and expiry status.
+- `vehicles` stores truck registration and vehicle metadata.
+- `driving_sessions` stores start time, end time, driving time, distance, status, driver, and vehicle.
+- `activity_logs` stores rest, driving, and other work activities.
+- `events` stores warnings and messages that can be resolved from the interface.
+- `violations` is used by the application to show driving-time violations with session and vehicle context.
+
+E/R diagram placeholder:
+
+![E/R diagram placeholder](docs/diagrams/er-diagram.png)
+
+## Database Logic
+
+Some of the business logic is handled directly in MySQL so the application can keep the route code focused on the user flow.
+
+The included SQL routines are:
+
+- `total_kortid_seconds(p_userID, p_from, p_to)`  
+  Calculates the total completed driving time for one driver in a selected date range.
+
+- `generate_card_expiry_events(p_days)`  
+  Creates unresolved card-expiry warnings for active cards that expire soon.
+
+- `weekly_report(p_from, p_to)`  
+  Groups completed driving sessions by driver and week, returning total hours, distance, and session count.
+
+## Representative SQL
+
+Driver history with vehicle information:
+
+```sql
 SELECT
     ds.sessionID,
     ds.startTid,
     ds.slutTid,
-    ds.körtid,
-    ds.sträcka,
+    ds.`körtid`,
+    ds.`sträcka`,
+    ds.status,
     v.registreringsnummer,
     v.fordonstyp,
     v.fabrikat
 FROM driving_sessions ds
-JOIN vehicles v ON ds.vehicleID = v.vehicleID
+LEFT JOIN vehicles v ON ds.vehicleID = v.vehicleID
 WHERE ds.userID = ?
 ORDER BY ds.startTid DESC;
+```
 
-2. Calculate total driving time between two dates for a driver in hours
-This query calculates the total driving time in hours for a specific driver during a selected period. It uses the aggregation function SUM() together with TIME_TO_SEC() to convert the stored driving time into seconds and then into hours.
-SELECT
-    ROUND(SUM(TIME_TO_SEC(ds.körtid)) / 3600, 2) AS total_drive_hours
-FROM driving_sessions ds
-WHERE ds.userID = ?
-  AND ds.startTid BETWEEN ? AND ?;
-3. Show a driver’s violations with session and vehicle context
-This query shows all violations for a specific driver and includes related driving session and vehicle information. It is a multirelation query because it combines data from violations, driving_sessions, and vehicles.
-SELECT
-    vio.violationID,
-    vio.violationstyp,
-    vio.detaljer,
-    vio.datum,
-    ds.sessionID,
-    ds.startTid,
-    ds.slutTid,
-    ds.körtid,
-    v.registreringsnummer,
-    v.fordonstyp
-FROM violations vio
-LEFT JOIN driving_sessions ds ON vio.sessionID = ds.sessionID
-LEFT JOIN vehicles v ON ds.vehicleID = v.vehicleID
-WHERE vio.userID = ?
-ORDER BY vio.datum DESC;
+Total driving time for a driver in a date range:
 
-4. Show dashboard statistics for a driver
-This query for a driver dashboard. It counts the total number of driving sessions and sums the total distance driven. The query uses the aggregation functions COUNT() and SUM().
-SELECT
-    COUNT(sessionID) AS total_sessions,
-    COALESCE(SUM(sträcka), 0) AS total_distance_km
-FROM driving_sessions
-WHERE userID = ?;
-5. Show each driver’s total driving time within a selected date range
-This query is intended for transport company managers. It calculates the total driving hours for each driver within a selected date range. It uses both JOIN and GROUP BY.
-SELECT
-    u.userID,
-    u.fName,
-    u.lName,
-    ROUND(SUM(TIME_TO_SEC(ds.körtid)) / 3600, 2) AS total_drive_hours,
-    COALESCE(SUM(ds.sträcka), 0) AS total_distance_km
-FROM users u
-JOIN driving_sessions ds ON u.userID = ds.userID
-WHERE ds.startTid BETWEEN ? AND ?
-GROUP BY u.userID, u.fName, u.lName
-ORDER BY total_drive_hours ASC;
-6. Stored Procedure: generate_card_expiry_events
-This stored procedure is used to automatically generate warning events for driver cards that are close to their expiry date.
-The procedure takes one input parameter, p_days, which specifies how many days ahead the system should check. It searches the driver_cards table for active cards whose expiry date falls within the specified number of days. For each matching card, the procedure inserts a new event into the events table with the event type CARD_EXPIRY_SOON.
-The procedure also includes a NOT EXISTS condition to prevent duplicate unresolved expiry warnings for the same user.
+```sql
+SELECT total_kortid_seconds(?, ?, ?) AS total_seconds;
+```
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `generate_card_expiry_events`(IN p_days INT)
-BEGIN
-  INSERT INTO events (userID, event_type, due_date, message)
-  SELECT
-    dc.userID,
-    'CARD_EXPIRY_SOON',
-    dc.expiry_date,
-    CONCAT('Driver card expires on ', dc.expiry_date, ' (within ', p_days, ' days).')
-  FROM driver_cards dc
-  WHERE dc.status = 'ACTIVE'
-    AND dc.expiry_date <= (CURRENT_DATE + INTERVAL p_days DAY)
-    AND NOT EXISTS (
-      SELECT 1
-      FROM events e
-      WHERE e.userID = dc.userID
-        AND e.event_type = 'CARD_EXPIRY_SOON'
-        AND e.is_resolved = FALSE
-    );
-END$$
-DELIMITER ;
-7. Stored Procedure: weekly_report
-This stored procedure generates a weekly driving report for all drivers within a specified time period. It takes two input parameters: p_from and p_to, which define the start and end dates for the report.
-The procedure retrieves driving session data from the driving_sessions table and joins it with the users table to obtain driver names. It then groups the results by driver and week number using the YEARWEEK() function.
-Several aggregation functions are used:
-•	SUM() to calculate the total driving time
-•	SUM() to calculate the total distance driven
-•	COUNT() to count the number of driving sessions
+Weekly company report:
 
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `weekly_report`(IN p_from DATE, IN p_to DATE)
-BEGIN
-  SELECT
-    u.userID AS user_id,
-    CONCAT(u.fName, ' ', u.lName) AS driver_name,
-    YEARWEEK(ds.startTid, 1) AS week_no,
-    ROUND(SUM(TIME_TO_SEC(ds.körtid)) / 3600, 2) AS total_drive_hours,
-    SUM(ds.sträcka) AS total_distance_km,
-    COUNT(*) AS session_count
-  FROM driving_sessions ds
-  JOIN users u ON u.userID = ds.userID
-  WHERE DATE(ds.startTid) BETWEEN p_from AND p_to
-    AND ds.status = 'avslutad'
-  GROUP BY u.userID, YEARWEEK(ds.startTid, 1)
-  ORDER BY week_no DESC, total_drive_hours DESC;
-END$$
-DELIMITER ;
-8.	Function: total_kortid_seconds
-This function calculates the total driving time in seconds for a specific driver within a selected date range.
-The function takes three input parameters:
-•	p_userID – the ID of the driver
-•	p_from – start date of the time interval
-•	p_to – end date of the time interval
-The function retrieves all completed driving sessions for the specified driver and time period from the driving_sessions table. It then sums the driving time using the TIME_TO_SEC() function to convert the stored time values into seconds.
-The COALESCE() function is used to ensure that the function returns 0 if no driving sessions exist in the selected time period.
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` FUNCTION `total_kortid_seconds`(
-    p_userID INT,
-    p_from DATE,
-    p_to DATE
-) RETURNS INT
-DETERMINISTIC
-BEGIN
-  DECLARE total INT;
+```sql
+CALL weekly_report(?, ?);
+```
 
-  SELECT COALESCE(SUM(TIME_TO_SEC(`körtid`)), 0)
-  INTO total
-  FROM driving_sessions
-  WHERE userID = p_userID
-    AND DATE(`startTid`) BETWEEN p_from AND p_to
-    AND status = 'avslutad';
+Card-expiry warning generation:
 
-  RETURN total;
-END$$
+```sql
+CALL generate_card_expiry_events(?);
+```
 
-DELIMITER ;
-https://www.transportstyrelsen.se/sv/vagtrafik/yrkestrafik/kor-och-vilotider/Fardskrivarkort/forarkort/
-https://github.com/mahmud25-cell/driver_card
-http://127.0.0.1:5000
-E/R diagram of the e-Driver Card System data model.
- 
+## Running Locally
 
+The app is set up for local development with MySQL.
+
+1. Create and activate a virtual environment.
+
+```bash
+cd driverCard
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+2. Install the Python dependencies.
+
+```bash
+pip install flask mysql-connector-python
+```
+
+3. Create a MySQL database.
+
+```sql
+CREATE DATABASE eforarkort
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+```
+
+4. Import the SQL files from this project and then load the demo data.
+
+The demo seed file creates realistic drivers, vehicles, driver cards, driving sessions, rest logs, events, and violations for recording a portfolio walkthrough.
+
+```bash
+mysql -u root -p eforarkort < demo_seed.sql
+```
+
+Demo accounts included in the seed:
+
+- Driver: `anna.driver@demo.se`
+- Driver: `omar.driver@demo.se`
+- Driver: `lina.driver@demo.se`
+- Admin: `sara.manager@demo.se`
+
+The Flask app expects the database connection values in `web_app.py` to match your local MySQL setup.
+
+5. Start the web app.
+
+```bash
+python web_app.py
+```
+
+6. Open the local site.
+
+```text
+http://127.0.0.1:5001
+```
+
+## Current Limitations
+
+- Login is intentionally lightweight for the demo flow and currently uses role selection plus email lookup.
+- The project is designed for local development, not production deployment.
+- Database credentials are stored in the app configuration and should be moved to environment variables before deployment.
+- The violation workflow depends on the expected database table and automation being present in the local database.
+
+## Future Improvements
+
+- Add proper authentication and password handling.
+- Move configuration to environment variables.
+- Add a full setup script for rebuilding the database from scratch.
+- Add exportable PDF/CSV reports for managers.
+- Improve driving-time rule checks with more detailed compliance logic.
+- Explore BankID-style identification for a more realistic Swedish driver-card flow.
+- Add vehicle integration as a future proof of concept, for example through Bluetooth or an onboard unit API.
+
+## Reference
+
+- Swedish Transport Agency information about driver cards:  
+  https://www.transportstyrelsen.se/sv/vagtrafik/yrkestrafik/kor-och-vilotider/Fardskrivarkort/forarkort/
+- Project repository:  
+  https://github.com/mahmud25-cell/driver_card

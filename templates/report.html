@@ -1,28 +1,90 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Weekly report</h2>
 
-<form method="post">
-  <label>Från (YYYY-MM-DD):</label>
-  <input name="from_date" value="{{ from_date or '2026-01-01' }}" required>
-  <label>Till (YYYY-MM-DD):</label>
-  <input name="to_date" value="{{ to_date or '2026-02-01' }}" required>
-  <button type="submit">Kör rapport</button>
-</form>
+<section class="page-header">
+  <div>
+    <h1>
+      {% if user.role == "admin" %}
+        Weekly report
+      {% else %}
+        Min weekly report
+      {% endif %}
+    </h1>
+    <p class="page-subtitle">
+      {% if user.role == "admin" %}
+        Summera körtid och körsträcka för alla förare inom vald period.
+      {% else %}
+        Summera din egen körtid och körsträcka inom vald period.
+      {% endif %}
+    </p>
+  </div>
+</section>
 
-{% if report %}
-<table>
-  <tr><th>User</th><th>Namn</th><th>Vecka</th><th>Timmar</th><th>KM</th><th>Pass</th></tr>
-  {% for r in report %}
-  <tr>
-    <td>{{ r.user_id }}</td>
-    <td>{{ r.driver_name }}</td>
-    <td>{{ r.week_no }}</td>
-    <td>{{ r.total_drive_hours }}</td>
-    <td>{{ r.total_distance_km }}</td>
-    <td>{{ r.session_count }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% endif %}
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h3>Rapportfilter</h3>
+      <p>Välj datumintervall och kör rapporten.</p>
+    </div>
+  </div>
+
+  <form method="post">
+    <div class="form-grid">
+      <div>
+        <label for="from_date">Från</label>
+        <input id="from_date" name="from_date" value="{{ from_date or '2026-01-01' }}" required>
+      </div>
+
+      <div>
+        <label for="to_date">Till</label>
+        <input id="to_date" name="to_date" value="{{ to_date or '2026-02-01' }}" required>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit">Kör rapport</button>
+    </div>
+  </form>
+</section>
+
+<section class="table-card">
+  <div class="table-toolbar">
+    <div>
+      <h3>Rapportresultat</h3>
+      <p>{{ report|length }} rader visas.</p>
+    </div>
+  </div>
+
+  {% if report %}
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>User</th>
+          <th>Namn</th>
+          <th>Vecka</th>
+          <th>Timmar</th>
+          <th>KM</th>
+          <th>Pass</th>
+        </tr>
+
+        {% for r in report %}
+        <tr>
+          <td>#{{ r.user_id }}</td>
+          <td><strong>{{ r.driver_name }}</strong></td>
+          <td>{{ r.week_no }}</td>
+          <td>{{ r.total_drive_hours }}</td>
+          <td>{{ r.total_distance_km }}</td>
+          <td>{{ r.session_count }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <h3>Ingen rapportdata hittades</h3>
+      <p>Kör rapporten för en period där det finns avslutade körpass.</p>
+    </div>
+  {% endif %}
+</section>
+
 {% endblock %}

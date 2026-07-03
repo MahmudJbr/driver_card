@@ -1,30 +1,90 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2>Lägg till körpass</h2>
-<form method="post">
-  <label>Fordon:</label>
-  <select name="vehicle_id" required>
-    {% for v in vehicles %}
-      <option value="{{ v.vehicleID }}">{{ v.registreringsnummer }}</option>
-    {% endfor %}
-  </select><br><br>
 
-  <label>StartTid (YYYY-MM-DD HH:MM:SS):</label><br>
-  <input name="startTid" value="2026-02-01 06:00:00" required><br><br>
+<section class="page-header">
+  <div>
+    <h1>Nytt körpass</h1>
+    <p class="page-subtitle">Registrera körning och valfri rast i samma arbetsflöde.</p>
+  </div>
+  <a class="btn btn-secondary" href="{{ url_for('sessions_page') }}">Till körpass</a>
+</section>
 
-  <label>SlutTid (YYYY-MM-DD HH:MM:SS):</label><br>
-  <input name="slutTid" value="2026-02-01 16:30:00" required><br><br>
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h3>Körpassinformation</h3>
+      <p>Fyll i fordon, tider, körsträcka och status.</p>
+    </div>
+  </div>
 
-  <label>Sträcka (km):</label><br>
-  <input name="stracka" type="number" value="600" required><br><br>
+  <form method="post">
+    <div class="form-grid">
+      <div>
+        <label for="vehicle_id">Fordon</label>
+        <select id="vehicle_id" name="vehicle_id" required>
+          {% for v in vehicles %}
+            <option value="{{ v.vehicleID }}">{{ v.registreringsnummer }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-  <label>Status:</label>
-  <select name="status">
-    <option value="avslutad" selected>avslutad</option>
-    <option value="pauserad">pauserad</option>
-    <option value="aktiv">aktiv</option>
-  </select><br><br>
+      <div>
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          <option value="avslutad" selected>Avslutad</option>
+          <option value="pauserad">Pauserad</option>
+          <option value="aktiv">Aktiv</option>
+        </select>
+      </div>
 
-  <button type="submit">Spara</button>
-</form>
+      <div>
+        <label for="startTid">Starttid</label>
+        <input id="startTid" name="startTid" value="2026-02-01 06:00:00" required>
+      </div>
+
+      <div>
+        <label for="slutTid">Sluttid</label>
+        <input id="slutTid" name="slutTid" value="2026-02-01 16:30:00" required>
+      </div>
+
+      <div>
+        <label for="stracka">Sträcka i km</label>
+        <input id="stracka" name="stracka" type="number" value="600" required>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="panel-header">
+        <div>
+          <h3>Rast</h3>
+          <p>Valfri rast kopplas till samma fordon och förare.</p>
+        </div>
+        <span class="badge badge-neutral">Valfritt</span>
+      </div>
+
+      <div class="form-grid">
+        <div>
+          <label for="rest_start">Rast start</label>
+          <input id="rest_start" name="rest_start" placeholder="2026-02-01 11:00:00">
+        </div>
+
+        <div>
+          <label for="rest_end">Rast slut</label>
+          <input id="rest_end" name="rest_end" placeholder="2026-02-01 11:45:00">
+        </div>
+
+        <div class="form-row-full">
+          <label for="rest_notes">Anteckning</label>
+          <input id="rest_notes" name="rest_notes" placeholder="Lunchrast, omlastning eller annan notering">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a class="btn btn-secondary" href="{{ url_for('sessions_page') }}">Avbryt</a>
+      <button type="submit">Spara körpass</button>
+    </div>
+  </form>
+</section>
+
 {% endblock %}
